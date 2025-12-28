@@ -1,0 +1,108 @@
+python
+py
+sql
+structured query language
+mysql
+postgresql
+postgres
+mongodb
+mongo
+redis
+aws
+amazon web services
+gcp
+google cloud platform
+azure
+microsoft azure
+docker
+kubernetes
+k8s
+jenkins
+ci/cd
+continuous integration
+continuous deployment
+git
+github
+version control
+javascript
+js
+typescript
+ts
+react
+reactjs
+react.js
+node.js
+nodejs
+node
+angular
+vue.js
+html
+css
+sass
+less
+django
+flask
+drf
+django rest framework
+spring boot
+java
+c++
+c#
+kotlin
+swift
+machine learning
+ml
+artificial intelligence
+ai
+deep learning
+dl
+nlp
+natural language processing
+computer vision
+cv
+genai
+generative ai
+tensorflow
+pytorch
+scikit-learn
+pandas
+numpy
+matplotlib
+seaborn
+data analysis
+data science
+data visualization
+power bi
+tableau
+excel
+linux
+ubuntu
+bash
+shell scripting
+terraform
+ansible
+agile
+scrum
+project management
+rest api
+graphql
+microservices
+r
+FastAPI
+Flask
+Microsoft Cloud
+small independent services
+DynamoDB
+Cassandra
+Terraform
+Helm charts
+Apache Kafka
+Spark Streaming
+Infrastructure Architect
+data streaming
+Big Data query optimization
+Infrastructure as Code (IaC)
+communication
+collaboration
+Data Analyst
+Collaborated with marketing team
