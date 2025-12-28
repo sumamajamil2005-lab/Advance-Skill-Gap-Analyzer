@@ -20,7 +20,7 @@ def generic_Parser(filepath, valid_skills):
             if re.search(pattern, content):
                 found_skills.append(clean_skill)
 
-        return list(set(found_skills))
+        return list(dict.fromkeys(found_skills))
 
     except FileNotFoundError:
         print(f"Error: Resume file not found at {filepath}")
