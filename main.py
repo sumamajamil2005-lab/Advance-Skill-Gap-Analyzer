@@ -1,74 +1,127 @@
-from parsers.file_loader import File_Loader
-from parsers.skill_parser import generic_Parser
+import streamlit as st
+import os
+from additional.extra_support import extract_and_save_resume 
 from matcher.skill_matcher import skill_matcher
+from parsers.file_loader import file_loader
+from parsers.skill_parser import generic_parser
 from writer.report_writer import Report_writer
-
-def get_recommendation(match_percentage, missing_skills):
-    """Provides a tailored recommendation based on match quality."""
-    if not missing_skills:
-        return "Perfect match! Your profile aligns exceptionally well with this role."
-    elif match_percentage >= 70:
-        return "Strong candidate. Targeted upskilling in missing areas will make you a top pick."
-    elif match_percentage >= 40:
-        return "Good potential. Consider completing a project involving the missing skills."
-    else:
-        return "Significant gap identified. Focus on foundational skills before applying."
-
-def get_skill_level(match_percentage):
-    """Categorizes the candidate's readiness level."""
-    if match_percentage >= 80:
-        return "Advanced / Job-Ready"
-    elif match_percentage >= 50:
-        return "Intermediate / Competitive"
-    else:
-        return "Beginner / Developing"
+from additional.recommendation import get_recommendation
+from additional.skill_level import get_skill_level
+from additional.extra_support import extract_and_save_resume
 
 def main():
-    # 1. Configuration & Loading
-    SKILLS_FILE = "skills/skills_list.txt"
-    RESUME_FILE = "data/resume.txt"
+    MASTER_SKILLS = "skills/skill_lists.txt"
     JD_FILE = "data/job_description.txt"
-    OUTPUT_FILE = "output/report.txt"
+    RESUME_FILE = "data/resume.txt"
+    REPORT_FILE = "output/report.txt"
 
-    # Load master skills from file
-    valid_skills = File_Loader(SKILLS_FILE)
 
-    # 2. Parsing
-    # We pass valid_skills to ensure we only extract relevant keywords
-    resume_skills = generic_Parser(RESUME_FILE, valid_skills)
-    jd_skills = generic_Parser(JD_FILE, valid_skills)
 
-    # 3. Matching Logic (Weighted)
-    matched, missing, percentage = skill_matcher(resume_skills, jd_skills)
 
-    # 4. Analysis
-    level = get_skill_level(percentage)
-    rec = get_recommendation(percentage, missing)
 
-    # 5. Writing Report
-    # Note: We now pass 'jd_skills' so the writer knows which ones are 'Primary'
-    Report_writer(
-        OUTPUT_FILE, 
-        matched, 
-        missing, 
-        percentage, 
-        level, 
-        rec, 
-        jd_skills
-    )
 
-    # 6. Console Output (Clean & Professional)
-    print("\n\n\n\n" + "="*40)
-    print("      SKILL GAP ANALYSIS COMPLETE")
-    print("="*40)
-    print(f"Match Score   : {percentage}%")
-    print(f"Result        : {level}")
-    print(f"Matched ({len(matched)}) : {', '.join(matched) if matched else 'None'}")
-    print(f"Missing ({len(missing)}) : {', '.join(missing) if missing else 'None'}")
-    print("-" * 40)
-    print(f"Recommendation: {rec}")
-    print(f"Detailed report saved to: {OUTPUT_FILE}")
-    print("="*40 + "\n")
+    st.set_page_config(page_title="Skill Gap Analyzer", layout="centered")
+
+    st.title("Skill Gap Analyzer")
+
+    # --- SECTION 1: JOB DESCRIPTION ---
+    st.subheader("Step 1: Job Description")
+    jd_input = st.text_area("Paste the Job Description (JD) here", height=150)
+
+    if st.button("Save Job Description"):
+        if jd_input:
+            if not os.path.exists("data"):
+                os.makedirs("data")
+            # JD ko file mein save karna
+            with open("data/job_description.txt", "w", encoding="utf-8-sig") as f:
+                f.write(jd_input)
+            st.success("Job Description saved to 'data/job_description.txt'!")
+        else:
+            st.warning("Please enter some text first.")
+
+    st.divider()
+
+    # --- SECTION 2: RESUME UPLOAD ---
+    st.subheader("Step 2: Upload Resume")
+    uploaded_file = st.file_uploader("Choose a PDF or DOCX file", type=["pdf", "docx"])
+
+    if uploaded_file is not None:
+        # 1. File ko data folder mein save karo
+        temp_path = os.path.join("data", uploaded_file.name)
+        with open(temp_path, "wb") as f:
+            f.write(uploaded_file.getbuffer())
+
+        # 2. Extract and Save Text (Tera purana function)
+        with st.spinner('Extracting text from resume...'):
+            success = extract_and_save_resume(temp_path)
+        
+        if success:
+            st.success(f"Resume text extracted and saved to 'data/resume.txt'!")
+            
+            # --- FINAL TRIGGER ---
+            if st.button("🚀 Analyze Skill Gap Now"):
+                st.info("Analysis report is being generated...")
+                content = file_loader(MASTER_SKILLS)
+                valid_jd = generic_parser(JD_FILE , content)
+                valid_resume = generic_parser(RESUME_FILE , content)
+                matched , missed  , points = skill_matcher(valid_jd , valid_resume)
+                recommend = get_recommendation(points , missed)
+                level = get_skill_level(points)
+                Report_writer(REPORT_FILE , matched, missed , points,level , recommend, valid_jd )
+
+
+                st.divider()
+                st.subheader("📊 Skill Gap Analysis Report")
+
+
+                with st.container():
+
+                    st.info("### SKILL GAP ANALYSIS COMPLETE")
+                    
+
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.metric(label="Match Score", value=f"{round(points , 2)}%")
+                    with col2:
+                        st.write(f"**OVERALL MATCH**: {round(points , 2)}%\n")
+                        st.write(f"**CANDIDATE LEVEL:** {level}")
+                        st.write(f"**ADVICE:** {recommend}")
+                        st.write("---")
+                    
+                    c1, c2 = st.columns(2)
+                    with c1:
+                        st.write("### ✅ Matched")
+                        if matched:
+                            matched_names = [s['name'] for s in matched]
+                            st.write(f"\n-> MATCHED SKILLS: {', '.join(matched_names)}\n")
+                
+                            full_matches = [s['name'] for s in matched if s['type'] == 'Full']
+                            partial_matches = [s['name'] for s in matched if s['type'] == 'Partial']
+                            semantic_matches = [s['name'] for s in matched if s['type'] == 'Semantic']
+
+                            st.write("   ∟ FULL MATCH: " + (", ".join(full_matches) if full_matches else "None") + "\n")
+                            st.write("   ∟ PARTIAL MATCH: " + (", ".join(partial_matches) if partial_matches else "None") + "\n")
+                            st.write("   ∟ CONCEPTUAL (AI): " + (", ".join(semantic_matches) if semantic_matches else "None") + "\n")
+                        else:
+                            st.write("None")
+
+                    with c2:
+                        st.write("### ❌ Missing")
+                        if missed:
+                            # Same logic missed ke liye
+                            missed_names = [str(m['name']) if isinstance(m, dict) else str(m) for m in missed]
+                            st.write(", ".join(missed_names))
+                        else:
+                            st.write("None")
+
+                            
+
+                    st.success(f"✅ Detailed report saved to: `output/report.txt`")
+
+                st.divider()
+
+        else:
+            st.error("Could not extract text. Check the file format.")
 
 if __name__ == "__main__":
     main()
