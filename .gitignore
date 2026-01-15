@@ -1,3 +1,35 @@
-.venv
-__pycache__
-pythonresumesample.pdf
+# --- Python Virtual Environments ---
+venv/
+env/
+.env
+ENV/
+bin/
+lib/
+include/
+
+# --- Python Cache & Compiled Files ---
+**/__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ipynb_checkpoints/
+
+# --- VS Code & IDE Settings ---
+.vscode/
+.devcontainer/
+.history/
+*.code-workspace
+
+# --- Streamlit & Local Data ---
+.streamlit/config.toml
+.streamlit/secrets.toml
+
+# --- OS Specific Files ---
+.DS_Store
+Thumbs.db
+
+# --- Heavy Models (Important!) ---
+*.pth
+*.bin
+*.model
+*.onnx
