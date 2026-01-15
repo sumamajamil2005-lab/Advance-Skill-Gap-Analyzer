@@ -20,10 +20,10 @@ def main():
     with st.sidebar:
         st.markdown("---")
         st.title("SUMAMA-DEV")
-        st.caption("v1.0 | Advanced Skill Gap Analyzer")
+        st.info("v1.0 | Advanced Skill Gap Analyzer")
         st.markdown("---")
     
-        st.info("Built with Python & Streamlit")
+        st.caption("Built with Python & Streamlit")
     
 
     st.title("Skill Gap Analyzer")
