@@ -9,17 +9,12 @@ from additional.recommendation import get_recommendation
 from additional.skill_level import get_skill_level
 from additional.extra_support import extract_and_save_resume
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MASTER_SKILLS = os.path.join(BASE_DIR, "skills", "skill_lists.txt")
+JD_FILE = os.path.join(BASE_DIR, "data", "job_description.txt")
+RESUME_FILE = os.path.join(BASE_DIR, "data", "resume.txt")
+REPORT_FILE = os.path.join(BASE_DIR, "output", "report.txt")
 def main():
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    MASTER_SKILLS = os.path.join(BASE_DIR, "skills", "skill_lists.txt")
-    JD_FILE = os.path.join(BASE_DIR, "data", "job_description.txt")
-    RESUME_FILE = os.path.join(BASE_DIR, "data", "resume.txt")
-    REPORT_FILE = os.path.join(BASE_DIR, "output", "report.txt")
-
-
-
-
-
 
     st.set_page_config(page_title="Skill Gap Analyzer", layout="centered")
 
@@ -63,6 +58,9 @@ def main():
             if st.button("🚀 Analyze Skill Gap Now"):
                 st.info("Analysis report is being generated...")
                 content = file_loader(MASTER_SKILLS)
+                if not content:
+                    st.error(f"Master Skills file nahi mili! Check path: {MASTER_SKILLS}")
+                    return
                 valid_jd = generic_parser(JD_FILE , content)
                 valid_resume = generic_parser(RESUME_FILE , content)
                 matched , missed  , points = skill_matcher(valid_jd , valid_resume)
