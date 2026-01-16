@@ -145,6 +145,7 @@ def main():
                     * **Semantic Power:** If a skill is marked 'Conceptual (AI)', it means we found a similar meaning, even if the word was different.
                     """)
 
+                st.divider()
                 st.download_button(
                     label="📥 Download Full Analysis Report",
                     data=report_content,
@@ -153,7 +154,7 @@ def main():
                     )
                 st.toast('Report is ready for download!')
 
-                st.divider()                       
+                                       
                    
 
         else:
