@@ -145,16 +145,16 @@ def main():
                     * **Semantic Power:** If a skill is marked 'Conceptual (AI)', it means we found a similar meaning, even if the word was different.
                     """)
 
-                            
-                    st.download_button(
+                st.download_button(
                     label="📥 Download Full Analysis Report",
                     data=report_content,
                     file_name="Skill_Gap_Analysis.txt",
                     mime="text/plain"
                     )
-                    st.toast('Report is ready for download!')
+                st.toast('Report is ready for download!')
 
-                    st.divider()
+                st.divider()                       
+                   
 
         else:
             st.error("Could not extract text. Check the file format.")
